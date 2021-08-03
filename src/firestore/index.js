@@ -43,7 +43,7 @@ export async function logOut() {
 export async function getCollection(id) { // we pass in the collection with "id" which is going to be lists
   const snapshot = await db.collection(id).get() // to get all the data we need to reference the collection and use the get()
   // it will be in the form of a promise, so we need to make the function async and await the response
-  // we will get back a questy "snapshot" so we'll call the variable holding this "snapshot"
+  // we will get back a query "snapshot" so we'll call the variable holding this "snapshot"
   // then all of the data- will be provided on snapshot.docs
   const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data()})) 
   // then we use the map() function to map over it and for each document, we want to create a new array where we return an object
@@ -112,7 +112,4 @@ export async function createList(list, user) { // pass in 2 arguments, list and 
       }
     ]
   })
-
-
-
 }

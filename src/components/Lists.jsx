@@ -42,6 +42,7 @@ function UserLists() {
     return (
     <>
       {/* display user list count */}
+      <UserListCount count={lists.length}/>  {/* <<here>> we provide a count prop to the UserListCOunt component */}
       <section className="text-gray-500 bg-gray-900 body-font">
         <div className="container px-5 py-5 mx-auto">
           <div className="flex flex-wrap -m-4">
@@ -56,7 +57,7 @@ function UserLists() {
   );
 }
 
-function UserListCount() {
+function UserListCount({ count }) { // we can destructure *count* and interpolate it in the <h2> div below
   return (
     <div className="container px-5 py-5 mb-6 bg-gray-800 rounded mx-auto flex justify-center text-center">
       <div className="p-4 sm:w-1/4 w-1/2">
@@ -72,7 +73,7 @@ function UserListCount() {
           <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
         </svg>
         <h2 className="title-font font-medium sm:text-4xl text-3xl text-white">
-          count
+          {count} {/* this is where we interpolate count. And then to display the lists that the user is part of - we do that in the ListItem()*/}
         </h2>
         <p className="leading-relaxed">Lists</p>
       </div>
@@ -80,27 +81,30 @@ function UserListCount() {
   );
 }
 
-function ListItem() {
+function ListItem({ list }) { // this takes the data from the list prop to display it to the user's lists - but we can destructure the list object
+  const { id, name, description, image} = list // this destructures the list object to get the values we need - id, name, description, image, and users that are a part of the list
   return (
     <div className="lg:w-1/3 sm:w-1/2 p-4">
       {" "}
-      <Link to={`/id`}>
+      <Link to={`/id`}> {/* the id that we get from destructuring the list is for this Link - which links various users to the list*/}
         <div className="flex relative">
           <img
             alt="gallery"
             className="absolute inset-0 w-full h-full object-cover object-center"
-            src={defaultImage}
+            src={image || defaultImage} {/* here we display either the image provided or the defaultImage */}
           />
           <div className="px-8 py-10 relative z-10 w-full border-4 border-gray-800 bg-gray-900 opacity-0 hover:opacity-100">
             <ul className="list-disc">
               <li className="tracking-widest text-sm title-font font-medium text-orange-500 mb-1">
-                Username + 2 others
+                {users[0].name} {users.length > 1 && `+ ${users.length - 1} others`}
+                {/* Here ^^ we display the users Username - and that comes from the user's array*/}
+                {/* Then we we can use a terenary to display if other the users are apart of the list */}
               </li>
             </ul>
             <h1 className="title-font text-lg font-medium text-white mb-3">
-              Name
+              {name} {/* This includes the name of the list from *name */}
             </h1>
-            <p className="leading-relaxed">Description</p>
+            <p className="leading-relaxed">{description}</p> {/* This includes the description of the list from *description property */}
           </div>
         </div>
       </Link>
