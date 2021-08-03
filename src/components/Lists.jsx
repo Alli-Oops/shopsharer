@@ -1,19 +1,54 @@
 import React from "react";
 import { Link } from "react-router-dom";
-// import defaultImage from "../../static/default.svg";
-// import * as db from "../firestore";
-// import Empty from "./shared/Empty";
-// import Error from "./shared/Error";
-// import Loading from "./shared/Loading";
+import defaultImage from "../../static/default.svg";
+import * as db from "../firestore";
+import Empty from "./shared/Empty";
+import Error from "./shared/Error";
+import Loading from "./shared/Loading";
+import useSWR from 'swr' // stale while revalidate 
 
+//This List component will display a list(s) that a user has created at the bottom of their "profile" page
+
+/*
 function UserLists() {
-  return (
+// REPLACED ALL THIS CODE WITH useSWR from the 'swr' library
+  const [lists, setLists] = React.useState([]) // we need this dedicated state in the form of an empty array
+  // We need to add some code here to fetch the data from the database: 
+  // we can use React.useEffect so that when the component mounts 
+  // then - we will use a function from firestore (this export function is in index.js that let's us get the entire collection from the database
+  React.useEffect(() => { 
+    // db.getCollection('lists') // getCollection is the function we wrote in the firestore folder's - index.js file. 'lists' is the name of the collection from the db that we are passing into that function
+    db.getUserLists('fTmWtjYUfAMX6EHXGBiFXvBUsxS2').then(lists =>{
+      setLists(lists) // once lists has been updated/populated with the specific users data... we can map over it
+    });
+  }, []) // here ^ we use .then() to resolve the promise in the async function in index.js file
+*/
+
+  function UserLists({ user }) {
+    const { data: lists, error } = useSWR(user.uid, db.getUserLists) 
+    // useSWR() accepts first argument - in this case the 'str' that is the userID. 
+    // And that first argument is passed to the second argument. 
+    // The second argument is a function that takes care of the fetching for us - so in this case, the db.getUserLists function
+    // from useSWR(user.uid, db.getUserLists) ... we get back an object {} that has a couple of values { data , error }
+    // data comes back if it resolves successfully OR error comes back if there is a problem with performing the request.
+    if (error) return <Error message={error.message} />;
+    // If there is an error, we want to return the error component
+    if (!lists) return <Loading/>;
+    // If we dont have our list data yet, we want to return our Loading.jsx component
+    if (lists.length === 0) return <Empty />;
+    // if we are able to fetch the data and there's no error, but the list array is empty meaning lists.length === 0)
+    // we can return the empty component - which just prompts the user to add a list.
+
+    return (
     <>
       {/* display user list count */}
       <section className="text-gray-500 bg-gray-900 body-font">
         <div className="container px-5 py-5 mx-auto">
           <div className="flex flex-wrap -m-4">
             {/* display lists that user is part of  */}
+            {lists.map(list => (  // as we map over each list, we can use the ListItem function from *below*
+              <ListItem key={list.id} list={list}/> // provide the key as {list.id} and pass all the list data down on a prop named list={list}
+            ))} 
           </div>
         </div>
       </section>
